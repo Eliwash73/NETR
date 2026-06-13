@@ -8,7 +8,7 @@ export default function TabLayout() {
         <NativeTabs.Trigger.Icon sf="house.fill" md="cards" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="items">
-        <NativeTabs.Trigger.Icon sf="menu2" md="density_small" />
+        <NativeTabs.Trigger.Icon sf="circle.grid.3x3.fill" md="density_small" />
         <NativeTabs.Trigger.Label>Pod Items</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
