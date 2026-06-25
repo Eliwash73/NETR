@@ -38,8 +38,9 @@ export default function Tab() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "grey",
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 100,
+    paddingTop: 75,
   },
 });
