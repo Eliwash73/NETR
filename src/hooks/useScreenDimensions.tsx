@@ -8,5 +8,6 @@ export default function useScreenDimensions() {
     height: height * 0.8,
     halfWidth: width / 2,
     halfHeight: height / 2,
+    horizontalPadding: width * 0.05,
   };
 }

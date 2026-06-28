@@ -1,20 +1,47 @@
-
-import { Text, View, Pressable, StyleSheet } from 'react-native';
-import useScreenDimensions from '@/hooks/useScreenDimensions';
+import { router } from "expo-router";
+import { useState } from "react";
+import { Pressable, StyleSheet, Text } from "react-native";
+import { colorChanger } from "./NETRTheme";
 
 type Props = {
-  onPress: () => void;
+  podTitle: string;
+  podColor: string;
+  podID: string;
 };
 
-export default function PodWidget({ onPress }: Props) {
-  const { halfWidth, halfHeight, height, width } = useScreenDimensions();
+export default function PodWidget({ podTitle, podColor, podID }: Props) {
+  const [isPressed, setIsPressed] = useState(false);
+  const [isHeld, setIsHeld] = useState(false);
 
   return (
-    <View style={[styles.itemContainer, { width: width }]} >
-      <Text>Pod Title</Text>
-      <Pressable onPress={onPress}>
-      </Pressable>
-    </View>
+    <Pressable
+      style={[
+        styles.itemContainer,
+        colorChanger(podColor),
+        (isPressed || isHeld) && styles.active,
+        isHeld && styles.held,
+      ]}
+      onPressIn={() => setIsPressed(true)}
+      onPressOut={() => {
+        setIsPressed(false);
+        setIsHeld(false);
+      }}
+      onLongPress={() => setIsHeld(true)}
+      onPress={() =>
+        router.push({
+          pathname: "/PodInfo",
+          params: {
+            title: podTitle,
+            color: podColor,
+            podID,
+          },
+        })
+      }
+    >
+      <Text style={styles.title}>
+        {podTitle} / {podColor}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -24,6 +51,20 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderWidth: 4,
     borderRadius: 20,
-    padding: 30,
+    padding: 15,
+  },
+  active: {
+    transform: [{ scale: 1.03 }],
+    // borderColor: "#ffffff",
+    opacity: 0.95,
+  },
+  held: {
+    // transform: [{ scale: 1.05 }],
+    // borderColor: "#ffffff",
+    
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "600",
   },
 });

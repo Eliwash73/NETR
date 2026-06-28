@@ -2,15 +2,15 @@ import { StyleSheet } from "react-native";
 
 
 export const NETRTheme = {
-    dark: false,
-    colors: {
-        primary: "#1B998B",
-        background: "#DCE2C8",
-        card: "#DCE2C8",
-        text: "#000",
-        border: "#DCE2C8",
-        notification: "#000",
-    },
+  dark: false,
+  colors: {
+    primary: "#1B998B",
+    background: "#DCE2C8",
+    card: "#DCE2C8",
+    text: "#000",
+    border: "#DCE2C8",
+    notification: "#000",
+  },
 };
 
 export const HONEYDEW = "#f8ffef";

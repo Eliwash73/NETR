@@ -1,20 +1,16 @@
-import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { Stack } from "expo-router/stack";
+import { ThemeProvider, DarkTheme, DefaultTheme } from "expo-router";
+import { useColorScheme } from "react-native";
+import { NETRTheme } from "@/components/NETRTheme";
 
-export default function TabLayout() {
+export default function RootLayout() {
+  const colorScheme = useColorScheme();
   return (
-    <NativeTabs>
-      <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="house.fill" md="cards" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="items">
-        <NativeTabs.Trigger.Icon sf="circle.grid.3x3.fill" md="density_small" />
-        <NativeTabs.Trigger.Label>Pod Items</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="settings">
-        <NativeTabs.Trigger.Icon sf="gear" md="settings" />
-        <NativeTabs.Trigger.Label>Calendar</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" options={{ title: "Back" }} />
+        <Stack.Screen name="PodInfo" options={{ headerShown: true }} />
+      </Stack>
+    </ThemeProvider>
   );
 }
