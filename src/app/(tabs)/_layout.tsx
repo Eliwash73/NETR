@@ -8,12 +8,12 @@ export default function TabLayout() {
         <NativeTabs.Trigger.Icon sf="house.fill" md="cards" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="items">
-        <NativeTabs.Trigger.Icon sf="circle.grid.3x3.fill" md="density_small" />
+        <NativeTabs.Trigger.Icon sf="circle.grid.3x3.fill" md="apps" />
         <NativeTabs.Trigger.Label>Pod Items</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="settings">
-        <NativeTabs.Trigger.Icon sf="gear" md="settings" />
-        <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger name="calendar">
+        <NativeTabs.Trigger.Icon sf="calendar" md="calendar_month" />
+        <NativeTabs.Trigger.Label>Calendar</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

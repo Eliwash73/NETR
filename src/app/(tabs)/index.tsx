@@ -45,6 +45,9 @@ export default function Tab() {
           />
         )}
       />
+      {/* <dialog
+        id="my_modal_1"
+        className="modal modal-bottom sm:modal-middle"></dialog> */}
     </View>
   );
 }

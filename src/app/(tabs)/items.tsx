@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 
-export default function infoTab() {
+export default function ItemsTab() {
   return (
     <View style={styles.container}>
       <Text>Items</Text>
