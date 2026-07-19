@@ -39,7 +39,7 @@ export default function PodWidget({ podTitle, podColor, podID }: Props) {
       }
     >
       <Text style={styles.title}>
-        {podTitle} / {podColor}
+        {podTitle}
       </Text>
     </Pressable>
   );
