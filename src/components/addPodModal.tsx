@@ -1,6 +1,6 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SelectList } from "react-native-dropdown-select-list";
+// import { SelectList } from "react-native-dropdown-select-list";
 import Modal from "react-native-modal";
 import { HONEYDEW, PURPLE, TEAL } from "./NETRTheme";
 import CustomButton from "./customButton";
@@ -48,13 +48,6 @@ export default function AddPodModal({
             value={value}
           />
           <Text style={styles.title}>Color:</Text>
-          <SelectList
-            setSelected={setSelected}
-            data={colorSelect}
-            save="value"
-            defaultOption={{ key: "teal", value: "Teal" }}
-            search={false}
-          />
         </ScrollView>
         <CustomButton title="Create Pod" onPress={addPod} color={TEAL} />
       </View>
