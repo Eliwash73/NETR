@@ -1,17 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
+import ItemScreen from "../../../pages/Items";
 
-export default function infoTab() {
-  return (
-    <View style={styles.container}>
-      <Text>Items</Text>
-    </View>
-  );
+export default function Items(){
+  return <ItemScreen />
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

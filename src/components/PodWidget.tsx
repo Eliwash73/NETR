@@ -39,7 +39,7 @@ export default function PodWidget({ podTitle, podColor, podID }: Props) {
       }
     >
       <Text style={styles.title}>
-        {podTitle} / {podColor}
+        {podTitle}
       </Text>
     </Pressable>
   );
@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     height: 80,
     marginVertical: 10,
-    borderWidth: 4,
     borderRadius: 20,
     padding: 15,
   },
