@@ -9,10 +9,11 @@ import {
   TextInput,
 } from "react-native";
 import { router, useIsFocused, useLocalSearchParams } from "expo-router";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { SelectList } from "react-native-dropdown-select-list";
 import useScreenDimensions from "@/hooks/useScreenDimensions";
+import { useSQLiteContext } from "expo-sqlite"; 
 import {
   GREY,
   HONEYDEW,
@@ -33,18 +34,9 @@ type Pod = {
   pod_name: string;
   pod_color: string;
 };
-const data = [
-  { id: "1", pod_name: "Fridge", pod_color: "Grey" },
-  { id: "2", pod_name: "Freezer", pod_color: "Honeydew" },
-  { id: "3", pod_name: "Shelf", pod_color: "Peach" },
-  { id: "4", pod_name: "Cabinet", pod_color: "Purple" },
-  { id: "5", pod_name: "Pod 5", pod_color: "Red" },
-  { id: "6", pod_name: "Pod 6", pod_color: "Teal" },
-  { id: "7", pod_name: "Pod 7", pod_color: "Yellow" },
-  { id: "8", pod_name: "Pod 8", pod_color: "Purple" },
-];
 
 export default function PodScreen() {
+  const db = useSQLiteContext(); 
   const { title, color, podID } = useLocalSearchParams();
   const { horizontalPadding } = useScreenDimensions();
   const [isModalVisible, setModalVisible] = useState(false);
@@ -56,49 +48,55 @@ export default function PodScreen() {
   const colorScheme = useColorScheme();
   const colorChanged = colorChanger(colorString);
   const [delID, setDelID] = useState(0);
-  // const [podOrder, setPodOrder] = useState(0);
   const [podName, setPodName] = useState("");
   const isFocused = useIsFocused();
 
   const handleModal = () => setModalVisible(!isModalVisible);
   const handleMenuModal = () => setMenuVisible(!isMenuVisible);
-  const addPodtoDB = async () => {
-    try {
-      // newPodId is the return of addPod.
-      // const newPodId = await addPod(podName.trim(), selectedColor);
 
-      // Create the new pod object using the ID, podName, and selectedColor
-      const newPod = {
-        // id: newPodId,
-        id: String(Date.now()),
-        pod_name: podName.trim(),
-        pod_color: selectedColor,
-        // pod_order: podOrder,
+  useEffect(() => {
+    if (isFocused) {
+      const fetchData = async () => {
+        try {
+          // Direct execution via context is safe because layout ensures table initialization
+          const result = await db.getAllAsync<Pod>("SELECT * FROM pods;");
+          setPods(result);
+
+          console.log("items page pods loaded:", result.length);
+        } catch (error) {
+          console.error("Failed to query pods:", error);
+        }
       };
+      fetchData();
+    }
+  }, [isFocused, db]);
 
-      // Add the new pod to the state array.
-      // setPods((existingPods) => [...existingPods, newPod]);
-      setPods((existingPods) => [...existingPods, newPod]);
-      // setPodOrder(newPod.pod_order);
+  const addPodtoDB = async () => {
+    if (!podName.trim()) return;
 
-      // Reset the state of the Modal.
+    try {
+      // Execute the insert into your structural table schema
+      const result = await db.runAsync(
+        "INSERT INTO pods (pod_name, pod_color) VALUES (?, ?);",
+        [podName.trim(), selectedColor],
+      );
+
+      // Re-fetch clean database records to keep state flawlessly aligned
+      const updatedPods = await db.getAllAsync<Pod>("SELECT * FROM pods;");
+      setPods(updatedPods);
+
       setModalVisible(false);
-      // Reset the state of podName.
       setPodName("");
-      console.log(newPod);
     } catch (error) {
-      console.error(error);
-      // console.log("Error adding pod to database: ", error.message);
+      console.error("Error writing new pod to database:", error);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* <Text>Home</Text> */}
       <FlatList
         data={pods}
-        // data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ paddingHorizontal: horizontalPadding }}
         ListFooterComponent={
           <View style={{ paddingBottom: 150 }}>
@@ -107,7 +105,7 @@ export default function PodScreen() {
         }
         renderItem={({ item }) => (
           <PodWidget
-            podID={item.id}
+            podID={String(item.id)}
             podTitle={item.pod_name}
             podColor={item.pod_color}
           />
@@ -128,7 +126,6 @@ export default function PodScreen() {
               maxLength={20}
               value={podName}
             />
-            {/* <Text style={styles.title}>Color:</Text> */}
             <View style={styles.addPodModalColor}>
               <SelectList
                 setSelected={(val: SetStateAction<string>) =>
@@ -158,7 +155,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 75,
   },
-
   editButton: {
     padding: 5,
     borderTopLeftRadius: 10,
@@ -169,7 +165,7 @@ const styles = StyleSheet.create({
   podContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10, // Adjust as needed
+    marginBottom: 10,
   },
   menuModal: {
     width: "100%",
