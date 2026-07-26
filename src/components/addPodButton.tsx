@@ -19,10 +19,12 @@ const AddPod = ({ onPress, buttonText }: Props) => {
 const styles = StyleSheet.create({
   container: {},
   button: {
-    backgroundColor: "black",
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    // height: 40,
+
+    backgroundColor: "red",
+    padding: 15,
+    marginVertical: 10,
+    // marginHorizontal: 16,
     borderRadius: 16,
   },
   buttonText: {

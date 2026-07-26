@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     height: 80,
     marginVertical: 10,
-    borderWidth: 4,
     borderRadius: 20,
     padding: 15,
   },
