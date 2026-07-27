@@ -8,8 +8,8 @@ import {
   Pressable,
   TextInput,
 } from "react-native";
-import { router, useIsFocused, useLocalSearchParams } from "expo-router";
-import { SetStateAction, useEffect, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { SetStateAction, useCallback, useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { SelectList } from "react-native-dropdown-select-list";
 import useScreenDimensions from "@/hooks/useScreenDimensions";
@@ -29,8 +29,10 @@ import PodWidget from "@/components/PodWidget";
 import AddPodButton from "@/components/addPodButton";
 import CustomButton from "@/components/customButton";
 
+import { addPod, fetchPods } from "@/util/db";
+
 type Pod = {
-  id: string;
+  id: number;
   pod_name: string;
   pod_color: string;
 };
@@ -49,49 +51,53 @@ export default function PodScreen() {
   const colorChanged = colorChanger(colorString);
   const [delID, setDelID] = useState(0);
   const [podName, setPodName] = useState("");
-  const isFocused = useIsFocused();
 
   const handleModal = () => setModalVisible(!isModalVisible);
   const handleMenuModal = () => setMenuVisible(!isMenuVisible);
 
-  useEffect(() => {
-    if (isFocused) {
-      const fetchData = async () => {
-        try {
-          // Direct execution via context is safe because layout ensures table initialization
-          const result = await db.getAllAsync<Pod>("SELECT * FROM pods;");
-          setPods(result);
+  const loadPods = useCallback(async () => {
+    try {
+      const result = await fetchPods(db);
+      setPods(result);
+    } catch (error) {
+      console.error("Failed to load pods:", error);
+    }
+  }, [db]);
 
-          console.log("items page pods loaded:", result.length);
-        } catch (error) {
-          console.error("Failed to query pods:", error);
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const load = async () => {
+        const result = await fetchPods(db);
+
+        if (isActive) {
+          setPods(result);
         }
       };
-      fetchData();
-    }
-  }, [isFocused, db]);
 
-  const addPodtoDB = async () => {
+      load();
+
+      return () => {
+        isActive = false;
+      };
+    }, [db]),
+  );
+
+  const addPodToDB = async () => {
     if (!podName.trim()) return;
 
     try {
-      // Execute the insert into your structural table schema
-      const result = await db.runAsync(
-        "INSERT INTO pods (pod_name, pod_color) VALUES (?, ?);",
-        [podName.trim(), selectedColor],
-      );
+      await addPod(db, podName.trim(), selectedColor);
 
-      // Re-fetch clean database records to keep state flawlessly aligned
-      const updatedPods = await db.getAllAsync<Pod>("SELECT * FROM pods;");
-      setPods(updatedPods);
+      await loadPods();
 
       setModalVisible(false);
       setPodName("");
     } catch (error) {
-      console.error("Error writing new pod to database:", error);
+      console.error(error);
     }
   };
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -140,7 +146,7 @@ export default function PodScreen() {
             </View>
           </ScrollView>
           <View style={{ paddingTop: 30 }}>
-            <CustomButton title="Create" onPress={addPodtoDB} color={TEAL} />
+            <CustomButton title="Create" onPress={addPodToDB} color={TEAL} />
           </View>
         </View>
       </Modal>
