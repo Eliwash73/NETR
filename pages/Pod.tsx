@@ -94,6 +94,7 @@ export default function PodScreen() {
 
       setModalVisible(false);
       setPodName("");
+      console.log(updatedPods)
     } catch (error) {
       console.error(error);
     }
