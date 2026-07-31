@@ -6,7 +6,7 @@ export default function PodInfo() {
   const { title, color, podID } = useLocalSearchParams();
   const colorString = Array.isArray(color) ? color.join('/') : color;
   const colorScheme = useColorScheme();
-  const colorchanged = colorChanger(colorString)
+  const colorChanged = colorChanger(colorString)
   const isDark = colorScheme === "dark";
   return (
     <View
