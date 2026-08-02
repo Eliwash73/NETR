@@ -29,7 +29,7 @@ import PodWidget from "@/components/PodWidget";
 import AddPodButton from "@/components/addPodButton";
 import CustomButton from "@/components/customButton";
 
-import { addPod, fetchPods } from "@/util/db";
+import { addPod, deletePod, fetchPods } from "@/util/db";
 
 type Pod = {
   id: number;
@@ -94,12 +94,22 @@ export default function PodScreen() {
 
       setModalVisible(false);
       setPodName("");
-      console.log(updatedPods)
     } catch (error) {
       console.error(error);
     }
   };
-  return (
+
+const handleDeletePod = (podID: string) => {
+  // e.g. call your API/store, then update local state
+  try {
+    // + converts the string to number
+    deletePod(db,+podID)
+  } catch (error) {
+        console.error(error);
+
+  }
+  setPods((prev) => prev.filter((p) => String(p.id) !== podID));
+};  return (
     <View style={styles.container}>
       <FlatList
         data={pods}
@@ -112,10 +122,13 @@ export default function PodScreen() {
         }
         renderItem={({ item }) => (
           <PodWidget
-            podID={String(item.id)}
-            podTitle={item.pod_name}
-            podColor={item.pod_color}
-          />
+                podID={String(item.id)}
+                podTitle={item.pod_name}
+                podColor={item.pod_color} 
+                deletePod={handleDeletePod} 
+                editPod={function (podID: string): void {
+                    throw new Error("Function not implemented.");
+                } }          />
         )}
       />
       <Modal
