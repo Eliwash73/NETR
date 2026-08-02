@@ -4,7 +4,7 @@ import { useColorScheme } from "react-native";
 import { SQLiteProvider } from "expo-sqlite";
 import { NETRTheme } from "@/components/NETRTheme";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { initPodDb } from "@/util/db";
+import { initializeDatabase } from "@/util/db";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -12,8 +12,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <SQLiteProvider
         databaseName="pod.db"
-        onInit={initPodDb}
-        useSuspense={false}
+        onInit={initializeDatabase}
       >
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
