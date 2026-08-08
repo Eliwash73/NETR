@@ -26,7 +26,6 @@ export interface PodItem {
 //
 
 export async function initializeDatabase(db: SQLiteDatabase) {
-    console.log("Initializing database");
 
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
@@ -69,7 +68,7 @@ export async function addPod(
     "INSERT INTO pods (pod_name, pod_color) VALUES (?, ?)",
     [podName, podColor],
   );
-  console.log(`New pod added with ID: ${result}`);
+  console.log(`New pod added with ID: ${result.lastInsertRowId}`);
   return Number(result.lastInsertRowId);
 }
 

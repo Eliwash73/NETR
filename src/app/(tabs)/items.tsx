@@ -1,5 +1,5 @@
-import ItemScreen from "../../../pages/Items";
+import ItemScreen from "../../pages/Items";
 
-export default function Items(){
-  return <ItemScreen />
+export default function Items() {
+  return <ItemScreen />;
 }

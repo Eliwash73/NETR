@@ -141,7 +141,7 @@ const handleDeletePod = (podID: string) => {
           <ScrollView>
             <TextInput
               style={styles.input}
-              placeholder="Enter a Pod Name"
+              placeholder={"Enter a Pod Name"}
               onChangeText={(text) => setPodName(text)}
               maxLength={20}
               value={podName}
@@ -154,7 +154,7 @@ const handleDeletePod = (podID: string) => {
                 data={colorSelect}
                 save="value"
                 search={false}
-                placeholder="Select a Color"
+                placeholder={"Select a Color"}
                 boxStyles={colorChanged}
               />
             </View>
