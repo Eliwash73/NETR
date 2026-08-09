@@ -1,18 +1,31 @@
 import { StyleSheet } from "react-native";
+import { DefaultTheme, DarkTheme } from "expo-router/react-navigation";
 
-
-export const NETRTheme = {
+export const NETRLightTheme = {
   dark: false,
   colors: {
     primary: "#1B998B",
     background: "#DCE2C8",
-    card: "#DCE2C8",
+    card: "#CDD3B9",
     text: "#000",
     border: "#DCE2C8",
     notification: "#000",
   },
+  fonts: DefaultTheme.fonts,
 };
 
+export const NETRDarkTheme = {
+  dark: true,
+  colors: {
+    primary: "#1B998B",
+    background: "#121212",
+    card: "#1E1E1E",
+    text: "#fff",
+    border: "#272727",
+    notification: "#fff",
+  },
+  fonts: DarkTheme.fonts,
+};
 export const HONEYDEW = "#f8ffef";
 export const PURPLE = "#675671";
 export const TEAL = "#1B998B";

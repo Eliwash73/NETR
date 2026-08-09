@@ -11,7 +11,7 @@ import { colorChanger,
   YELLOW,
   getColorByValue
  } from "@/components/NETRTheme";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useTheme } from "expo-router";
 import { SetStateAction,  useState } from "react";
 import {
   ScrollView,
@@ -26,6 +26,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { SelectList } from "react-native-dropdown-select-list";
 import Modal from "react-native-modal";
 export default function PodInfo() {
+  const { colors } = useTheme();
   const { title, color, podID } = useLocalSearchParams();
   const colorString = Array.isArray(color) ? color.join("/") : color;
   const colorScheme = useColorScheme();
@@ -66,8 +67,9 @@ export default function PodInfo() {
 
     const numColumns = 2;
   return (
-    <View>
-<Text>{title}</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={{ color: colors.text }}>{title}</Text>
+      <AddPodItemButton onPress={handleModal} buttonText={"+"} />
     </View>
   );
 }
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flex: 1,
-    backgroundColor: GREY,
+    // backgroundColor: GREY,
     justifyContent: "flex-end",
     borderRadius: 16,
     padding: 10,

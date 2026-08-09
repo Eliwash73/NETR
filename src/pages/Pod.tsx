@@ -8,7 +8,7 @@ import {
   Pressable,
   TextInput,
 } from "react-native";
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams, useTheme } from "expo-router";
 import { SetStateAction, useCallback, useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { SelectList } from "react-native-dropdown-select-list";
@@ -39,6 +39,7 @@ type Pod = {
 
 export default function PodScreen() {
   const db = useSQLiteContext(); 
+  const { colors } = useTheme();
   const { title, color, podID } = useLocalSearchParams();
   const { horizontalPadding } = useScreenDimensions();
   const [isModalVisible, setModalVisible] = useState(false);
@@ -110,7 +111,7 @@ const handleDeletePod = (podID: string) => {
   }
   setPods((prev) => prev.filter((p) => String(p.id) !== podID));
 };  return (
-    <View style={styles.container}>
+    <View style={[styles.container,{backgroundColor: colors.background}]}>
       <FlatList
         data={pods}
         keyExtractor={(item) => String(item.id)}
@@ -171,7 +172,6 @@ const handleDeletePod = (podID: string) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "grey",
     justifyContent: "center",
     paddingTop: 75,
   },

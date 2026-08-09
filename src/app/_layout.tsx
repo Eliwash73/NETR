@@ -2,12 +2,14 @@ import { Stack } from "expo-router/stack";
 import { ThemeProvider, DarkTheme, DefaultTheme } from "expo-router";
 import { useColorScheme } from "react-native";
 import { SQLiteProvider } from "expo-sqlite";
-import { NETRTheme } from "@/components/NETRTheme";
+import { NETRDarkTheme, NETRLightTheme } from "@/components/NETRTheme";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initializeDatabase } from "@/util/db";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const theme = colorScheme === "dark" ? NETRDarkTheme : NETRLightTheme;
+
   return (
     <SafeAreaProvider>
       <SQLiteProvider
@@ -15,7 +17,7 @@ export default function RootLayout() {
         onInit={initializeDatabase}
       >
         <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          value={theme}
         >
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" options={{ title: "Back" }} />
