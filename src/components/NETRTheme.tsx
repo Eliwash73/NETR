@@ -18,8 +18,8 @@ export const NETRDarkTheme = {
   dark: true,
   colors: {
     primary: "#1B998B",
-    background: "#121212",
-    card: "#1E1E1E",
+    background: "#20251E",
+    card: "#2D3429",
     text: "#fff",
     border: "#272727",
     notification: "#fff",
@@ -28,13 +28,14 @@ export const NETRDarkTheme = {
 };
 export const HONEYDEW = "#f8ffef";
 export const PURPLE = "#675671";
-export const TEAL = "#1B998B";
-export const GREY = "#6B818C";
+export const TEAL = "#4FAFA5";//"#1B998B";
+export const GREY = "#7D929A";//"#6B818C";
 export const RED = "#C83E4D";
-export const PEACH = "#F4D6CC";
+export const PEACH = "#D8B9AF";//"#F4D6CC";
 export const YELLOW = "#F4B860";
-export const EGGPLANT = "#713E5A";
+export const EGGPLANT = "#76677D";//"#713E5A";
 export const CORAL = "#EF767A";
+// export const SLATE = "#7D929A";
 
 export const colorSelect = [
     { key: "1", value: "Honeydew", color: HONEYDEW },
@@ -45,6 +46,7 @@ export const colorSelect = [
     { key: "6", value: "Peach", color: PEACH },
     { key: "7", value: "Yellow", color: YELLOW },
     { key: "8", value: "Coral", color: CORAL },
+    { key: "9", value: "Slate", color: EGGPLANT },
 ];
 
 export function getColorByValue(value: string): string {
@@ -85,6 +87,9 @@ const styles = StyleSheet.create({
     coralBC: {
         backgroundColor: CORAL,
     },
+    slateBC: {
+        backgroundColor: EGGPLANT,
+    },
 });
 
 type ColorStyle = { backgroundColor: string; color?: string };
@@ -97,6 +102,7 @@ const colorStyleMap: Record<string, ColorStyle> = {
   Peach: styles.peachBC,
   Yellow: styles.yellowBC,
   Coral: styles.coralBC,
+  Slate: styles.slateBC,
 };
 
 export function colorChanger(color: string): ColorStyle {

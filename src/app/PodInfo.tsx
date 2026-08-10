@@ -1,82 +1,291 @@
+import { PodItemCategories, PodItemUnits } from "@/components/NETRCategories";
+import { HONEYDEW, TEAL, getColorByValue } from "@/components/NETRTheme";
+import PodItemWidget from "@/components/PodItemWidget";
 import AddPodItemButton from "@/components/addPodItemButton";
 import CustomButton from "@/components/customButton";
-import { PodItemCategories, PodItemUnits } from "@/components/NETRCategories";
-import { colorChanger,  
-   GREY,
-  HONEYDEW,
-  PEACH,
-  PURPLE,
-  RED,
-  TEAL,
-  YELLOW,
-  getColorByValue
- } from "@/components/NETRTheme";
-import { Stack, useLocalSearchParams, useTheme } from "expo-router";
-import { SetStateAction,  useState } from "react";
+import DeletePodItemButton from "@/components/deletePodItemButton";
+import useScreenDimensions from "@/hooks/useScreenDimensions";
+import { addPodItem, deletePodItem, fetchPodsItems } from "@/util/db";
+import DateTimePicker from "@expo/ui/community/datetime-picker";
+import { DatePicker, Host } from "@expo/ui/swift-ui";
+import { useFocusEffect, useLocalSearchParams, useTheme } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
+import { useCallback, useState } from "react";
 import {
+  FlatList,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  useColorScheme,
   View,
+  useColorScheme,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-
 import { SelectList } from "react-native-dropdown-select-list";
 import Modal from "react-native-modal";
+
+type PodItem = {
+  id: number;
+  pod_id: number;
+  pod_color: string;
+  pod_item_name: string;
+  pod_item_quantity: number;
+  pod_item_quantity_unit: string;
+  pod_item_date: string;
+  pod_category: string;
+};
+
 export default function PodInfo() {
+  const db = useSQLiteContext();
   const { colors } = useTheme();
   const { title, color, podID } = useLocalSearchParams();
+  const { horizontalPadding } = useScreenDimensions();
   const colorString = Array.isArray(color) ? color.join("/") : color;
   const colorScheme = useColorScheme();
-  const colorChanged = colorChanger(colorString);
   const isDark = colorScheme === "dark";
   const [isModalVisible, setModalVisible] = useState(false);
-
-  const handleModal = () => setModalVisible(() => !isModalVisible);
-  const [podItems, setPodItems] = useState([]);
+  const [podItems, setPodItems] = useState<PodItem[]>([]);
   const [podItemName, setPodItemName] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [podItemQuantity, setPodItemQuantity] = useState(0);
+  const [podItemQuantity, setPodItemQuantity] = useState("");
   const [podItemQuantityUnit, setPodItemQuantityUnit] = useState("Other");
   const [selectedCategory, setSelectedCategory] = useState("Other");
   const [show, setShow] = useState(false);
-  const handleQuantityChange = (text: string) => {
-    // Remove any characters that are not digits or decimal points
-    const cleanedText = text.replace(/[^0-9.]/g, "");
 
-    // Ensure there is at most one decimal point
+  const numericPodID = typeof podID === "string" ? parseInt(podID, 10) : 0;
+
+  const handleModal = () => setModalVisible(!isModalVisible);
+
+  const loadPodItems = useCallback(async () => {
+    if (!numericPodID) return;
+
+    try {
+      const items = await fetchPodsItems(db, numericPodID);
+      setPodItems(items);
+    } catch (error) {
+      console.error("Failed to load pod items:", error);
+    }
+  }, [db, numericPodID]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const fetchData = async () => {
+        if (!numericPodID) return;
+
+        try {
+          const items = await fetchPodsItems(db, numericPodID);
+          if (isActive) {
+            setPodItems(items);
+          }
+        } catch (error) {
+          console.error("Failed to load pod items:", error);
+        }
+      };
+
+      fetchData();
+
+      return () => {
+        isActive = false;
+      };
+    }, [db, numericPodID]),
+  );
+
+  const handleQuantityChange = (text: string) => {
+    const cleanedText = text.replace(/[^0-9.]/g, "");
     const decimalCount = (cleanedText.match(/\./g) || []).length;
+
     if (decimalCount > 1) {
-      return; // Do nothing if there's more than one decimal point
+      return;
     }
 
-    // Set the cleaned and valid text
-    setPodItemQuantity(Number(cleanedText));
+    setPodItemQuantity(cleanedText);
   };
-    const onChangeDate = (event: any, selectedDate: any) => {
-      const currentDate = selectedDate;
+
+  const addPodItemToDB = async () => {
+    if (!podItemName.trim()) return;
+
+    const quantity = Number(podItemQuantity) || 0;
+
+    try {
+      await addPodItem(
+        db,
+        numericPodID,
+        colorString,
+        podItemName.trim(),
+        quantity,
+        podItemQuantityUnit,
+        selectedDate.toLocaleDateString("fr-CA"),
+        selectedCategory,
+      );
+      console.log(
+        numericPodID,
+        colorString,
+        podItemName.trim(),
+        quantity,
+        podItemQuantityUnit,
+        selectedDate.toLocaleDateString("fr-CA"),
+        selectedCategory,
+      );
+      await loadPodItems();
+      setModalVisible(false);
+      setPodItemName("");
+      setPodItemQuantity("");
+      setPodItemQuantityUnit("Other");
+      setSelectedCategory("Other");
+      setSelectedDate(new Date());
       setShow(false);
-      setSelectedDate(currentDate);
-    };
+    } catch (error) {
+      console.error("Failed to add pod item:", error);
+    }
+  };
 
-    const showDatePicker = () => {
+  const deletePodItemFromDB = async (id: number) => {
+    try {
+      await deletePodItem(db, id);
+      setPodItems((existingItems) =>
+        existingItems.filter((item) => item.id !== id),
+      );
+    } catch (error) {
+      console.error(`Failed to delete pod item ${id}:`, error);
+    }
+  };
+
+  const onChangeDate = (_event: any, selected?: Date) => {
+    const currentDate = selected || selectedDate;
+    setShow(false);
+    setSelectedDate(currentDate);
+  };
+
+  const showDatePicker = () => {
+    setShow(true);
+  };
+
+  const showOptions = () => {
+    if (Platform.OS === "ios") {
       setShow(true);
-    };
+    } else {
+      setShow(true);
+    }
+  };
 
-    const numColumns = 2;
+  const numColumns = 2;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={{ color: colors.text }}>{title}</Text>
-      <AddPodItemButton onPress={handleModal} buttonText={"+"} />
+      <FlatList
+        data={podItems}
+        keyExtractor={(item) => String(item.id)}
+        numColumns={numColumns}
+        contentContainerStyle={{
+          paddingHorizontal: horizontalPadding,
+          paddingBottom: 150,
+        }}
+        columnWrapperStyle={styles.columnWrapper}
+        renderItem={({ item }) => (
+          <View
+            style={[
+              styles.itemContainer,
+              { backgroundColor: getColorByValue(colorString) },
+            ]}
+          >
+            <PodItemWidget
+              podColor={colorString}
+              podID={String(item.pod_id)}
+              podItemName={item.pod_item_name}
+              podItemQuantity={item.pod_item_quantity}
+              podItemQuantityUnit={item.pod_item_quantity_unit}
+              podItemDate={item.pod_item_date}
+              podCategory={item.pod_category}
+            />
+            <DeletePodItemButton
+              onPress={() => deletePodItemFromDB(item.id)}
+              buttonText={"x"}
+            />
+          </View>
+        )}
+      />
+      <AddPodItemButton
+        onPress={handleModal}
+        buttonText="+"
+        podColor={getColorByValue(colorString)}
+      />
+
+      <Modal
+        isVisible={isModalVisible}
+        avoidKeyboard={true}
+        onBackButtonPress={() => setModalVisible(false)}
+        onBackdropPress={() => setModalVisible(false)}
+      >
+        <View style={styles.modal}>
+            <TextInput
+              style={styles.nameInput}
+              placeholder="Enter an Item Name"
+              onChangeText={(text) => setPodItemName(text)}
+              maxLength={20}
+              value={podItemName}
+            />
+            <View style={styles.quantityUnitContainer}>
+              <TextInput
+                style={styles.quantityInput}
+                placeholder="Enter a quantity"
+                keyboardType="numeric"
+                onChangeText={handleQuantityChange}
+                value={podItemQuantity}
+              />
+              <SelectList
+                setSelected={(val: string) => setPodItemQuantityUnit(val)}
+                data={PodItemUnits}
+                save="value"
+                placeholder="Select a Unit"
+                search={true}
+              />
+            </View>
+
+            <SelectList
+              setSelected={(val: string) => setSelectedCategory(val)}
+              data={PodItemCategories}
+              save="value"
+              placeholder="Select a Category"
+              search={true}
+            />
+
+            {Platform.OS !== "ios" && (
+              <>
+                <CustomButton
+                  onPress={showOptions}
+                  title="Enter Best By date"
+                  color={TEAL}
+                />
+                <Text>Selected: {selectedDate.toDateString()}</Text>
+              </>
+            )}
+            {Platform.OS === "ios" && (
+              <Host matchContents>
+                <DatePicker
+                  title="Best By Date"
+                  selection={selectedDate}
+                  displayedComponents={["date"]}
+                  onDateChange={(date: Date) => setSelectedDate(date)}
+                />
+              </Host>
+            )}
+            {Platform.OS !== "ios" && show && (
+              <DateTimePicker value={selectedDate} onChange={onChangeDate} />
+            )}
+          <View style={{ paddingTop: 10 }}>
+            <CustomButton title="ADD" onPress={addPodItemToDB} color={TEAL} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: "center",
   },
   title: {
     fontSize: 20,
@@ -90,7 +299,6 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flex: 1,
-    // backgroundColor: GREY,
     justifyContent: "flex-end",
     borderRadius: 16,
     padding: 10,
@@ -104,7 +312,6 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 16,
-    // color: "#fff",
     fontWeight: "600",
   },
   itemCode: {
@@ -113,10 +320,8 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   modal: {
-    // height: "30%",
     backgroundColor: HONEYDEW,
     borderRadius: 16,
-    // margin: 0,
     justifyContent: "flex-end",
     padding: 25,
   },
@@ -126,7 +331,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 8,
     padding: 10,
-    // marginBottom: 20,
     marginRight: 10,
   },
   nameInput: {

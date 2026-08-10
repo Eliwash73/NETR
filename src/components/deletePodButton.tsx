@@ -1,6 +1,7 @@
 import React from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { RED } from "./NETRTheme";
+import { useTheme } from "expo-router";
 
 type Props = {
   onPress: () => void;
@@ -8,6 +9,8 @@ type Props = {
 };
 
 const DeletePodButton = ({ onPress, buttonText }: Props) => {
+  const { colors } = useTheme();
+
   const handleDelete = () => {
     Alert.alert(
       "Confirm Delete",
@@ -27,7 +30,7 @@ const DeletePodButton = ({ onPress, buttonText }: Props) => {
   return (
     <View style={styles.container}>
       <Pressable onPress={handleDelete} style={styles.button}>
-        <Text style={styles.buttonText}>{buttonText}</Text>
+        <Text style={[styles.buttonText, { color: colors.text }]}>{buttonText}</Text>
       </Pressable>
     </View>
   );
@@ -44,8 +47,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    color: "white",
-    fontSize: 16,
+    fontSize: 32,
   },
 });
 
