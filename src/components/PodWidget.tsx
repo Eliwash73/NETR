@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   active: {
-    transform: [{ scale: 1.03 }],
-    opacity: 0.95,
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
   },
   title: {
     fontSize: 28,

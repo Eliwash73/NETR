@@ -1,11 +1,24 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { useTheme } from "expo-router/react-navigation";
 
 export default function TabLayout() {
+  const { colors } = useTheme();
+
   return (
-    <NativeTabs>
+    <NativeTabs
+      backgroundColor={colors.card}
+      tintColor={colors.primary}
+      iconColor={{
+        default: colors.text, // inactive tabs
+        selected: colors.primary, // active tab
+      }}
+      rippleColor={colors.background}
+      indicatorColor={colors.background}
+      disableIndicator={true}
+    >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="house.fill" md="cards" />
+        <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="items">
         <NativeTabs.Trigger.Icon sf="circle.grid.3x3.fill" md="apps" />
