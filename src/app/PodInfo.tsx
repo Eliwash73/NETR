@@ -184,12 +184,7 @@ export default function PodInfo() {
         }}
         columnWrapperStyle={styles.columnWrapper}
         renderItem={({ item }) => (
-          <View
-            style={[
-              styles.itemContainer,
-              { backgroundColor: getColorByValue(colorString) },
-            ]}
-          >
+          <View style={{ flex: 1, margin: 5 }}>
             <PodItemWidget
               podColor={colorString}
               podID={String(item.pod_id)}
@@ -198,10 +193,6 @@ export default function PodInfo() {
               podItemQuantityUnit={item.pod_item_quantity_unit}
               podItemDate={item.pod_item_date}
               podCategory={item.pod_category}
-            />
-            <DeletePodItemButton
-              onPress={() => deletePodItemFromDB(item.id)}
-              buttonText={"x"}
             />
           </View>
         )}
@@ -218,39 +209,51 @@ export default function PodInfo() {
         onBackButtonPress={() => setModalVisible(false)}
         onBackdropPress={() => setModalVisible(false)}
       >
-        <View style={styles.modal}>
+        <View style={[styles.modal, { backgroundColor: colors.card }]}>
+          <TextInput
+            style={[
+              styles.nameInput,
+              { borderColor: colors.background, color: colors.text },
+            ]}
+            placeholder="Enter an Item Name"
+            placeholderTextColor={colors.text}
+            onChangeText={(text) => setPodItemName(text)}
+            maxLength={20}
+            value={podItemName}
+          />
+          <View style={styles.quantityUnitContainer}>
             <TextInput
-              style={styles.nameInput}
-              placeholder="Enter an Item Name"
-              onChangeText={(text) => setPodItemName(text)}
-              maxLength={20}
-              value={podItemName}
+              style={[
+                styles.quantityInput,
+                { borderColor: colors.background, color: colors.text },
+              ]}
+              placeholder="Enter a quantity"
+              placeholderTextColor={colors.text}
+              keyboardType="numeric"
+              onChangeText={handleQuantityChange}
+              value={podItemQuantity}
             />
-            <View style={styles.quantityUnitContainer}>
-              <TextInput
-                style={styles.quantityInput}
-                placeholder="Enter a quantity"
-                keyboardType="numeric"
-                onChangeText={handleQuantityChange}
-                value={podItemQuantity}
-              />
-              <SelectList
-                setSelected={(val: string) => setPodItemQuantityUnit(val)}
-                data={PodItemUnits}
-                save="value"
-                placeholder="Select a Unit"
-                search={true}
-              />
-            </View>
-
             <SelectList
-              setSelected={(val: string) => setSelectedCategory(val)}
-              data={PodItemCategories}
+              setSelected={(val: string) => setPodItemQuantityUnit(val)}
+              data={PodItemUnits}
               save="value"
-              placeholder="Select a Category"
+              placeholder="Select a Unit"
+              inputStyles={{ color: colors.text }}
+              boxStyles={{ borderColor: colors.background }}
               search={true}
             />
+          </View>
 
+          <SelectList
+            setSelected={(val: string) => setSelectedCategory(val)}
+            data={PodItemCategories}
+            save="value"
+            placeholder="Select a Category"
+            inputStyles={{ color: colors.text }}
+            boxStyles={{ borderColor: colors.background }}
+            search={true}
+          />
+          <View style={{ paddingTop: 10, paddingBottom: 10, gap: 10 }}>
             {Platform.OS !== "ios" && (
               <>
                 <CustomButton
@@ -258,23 +261,28 @@ export default function PodInfo() {
                   title="Enter Best By date"
                   color={TEAL}
                 />
-                <Text>Selected: {selectedDate.toDateString()}</Text>
+                <Text style={{ color: colors.text }}>
+                  Selected: {selectedDate.toDateString()}
+                </Text>
               </>
             )}
             {Platform.OS === "ios" && (
-              <Host matchContents>
-                <DatePicker
-                  title="Best By Date"
-                  selection={selectedDate}
-                  displayedComponents={["date"]}
-                  onDateChange={(date: Date) => setSelectedDate(date)}
-                />
-              </Host>
+              <View style={{ minHeight: 45, justifyContent: "center" }}>
+                <Host matchContents>
+                  <DatePicker
+                    title="Best By Date"
+                    selection={selectedDate}
+                    displayedComponents={["date"]}
+                    onDateChange={(date: Date) => setSelectedDate(date)}
+                  />
+                </Host>
+              </View>
             )}
             {Platform.OS !== "ios" && show && (
               <DateTimePicker value={selectedDate} onChange={onChangeDate} />
             )}
-          <View style={{ paddingTop: 10 }}>
+          </View>
+          <View>
             <CustomButton title="ADD" onPress={addPodItemToDB} color={TEAL} />
           </View>
         </View>
@@ -320,7 +328,6 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   modal: {
-    backgroundColor: HONEYDEW,
     borderRadius: 16,
     justifyContent: "flex-end",
     padding: 25,
@@ -328,15 +335,14 @@ const styles = StyleSheet.create({
   quantityInput: {
     flex: 1,
     borderWidth: 1,
-    height: 40,
+    height: 45,
     borderRadius: 8,
     padding: 10,
     marginRight: 10,
   },
   nameInput: {
-    flex: 1,
     borderBottomWidth: 1,
-    height: 40,
+    height: 45,
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,

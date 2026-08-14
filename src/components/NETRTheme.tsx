@@ -20,7 +20,7 @@ export const NETRDarkTheme = {
     primary: "#1B998B",
     background: "#20251E",
     card: "#2D3429",
-    text: "#fff",
+    text: "#DCE2C8",
     border: "#272727",
     notification: "#fff",
   },

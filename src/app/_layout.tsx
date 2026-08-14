@@ -21,7 +21,8 @@ export default function RootLayout() {
         >
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" options={{ title: "Back" }} />
-            <Stack.Screen name="PodInfo" options={{ headerShown: true }} />
+            <Stack.Screen name="PodInfo" options={{ title: "Pod Info", headerShown: true }} />
+            <Stack.Screen name="PodItemInfo" options={{ title: "Pod Item Info", headerShown: true }} />
           </Stack>
         </ThemeProvider>
       </SQLiteProvider>
