@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { DefaultTheme, DarkTheme } from "expo-router/react-navigation";
 
+
 export const NETRLightTheme = {
   dark: false,
   colors: {
@@ -9,7 +10,7 @@ export const NETRLightTheme = {
     card: "#CDD3B9",
     text: "#000",
     border: "#DCE2C8",
-    notification: "#000",
+    notification: "#20251E",
   },
   fonts: DefaultTheme.fonts,
 };
@@ -22,7 +23,7 @@ export const NETRDarkTheme = {
     card: "#2D3429",
     text: "#DCE2C8",
     border: "#272727",
-    notification: "#fff",
+    notification: "#DCE2C8",
   },
   fonts: DarkTheme.fonts,
 };

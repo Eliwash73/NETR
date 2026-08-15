@@ -11,11 +11,10 @@ type AddPodItemButtonProps = {
 
 const AddPodItemButton = ({ onPress, buttonText, podColor }: AddPodItemButtonProps) => {
   const { colors } = useTheme();
-    
     return (
     <View style={styles.container}>
-      <Pressable onPress={onPress} style={[styles.button, { backgroundColor: podColor }]}>
-        <Text style={[styles.buttonText, { color: colors.text }]}>{buttonText}</Text>
+      <Pressable onPress={onPress} style={[styles.button, { backgroundColor: colors.notification }]}>
+        <Text style={[styles.buttonText, { color: colors.background }]}>{buttonText}</Text>
       </Pressable>
     </View>
   );
@@ -26,7 +25,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     right: 10,
-    // padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 16,
@@ -34,9 +32,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
-    // backgroundColor: "black",
     paddingVertical: 10,
-    // paddingHorizontal: 30,
     borderRadius: 16,
     width: "90%",
     alignItems: "center",
