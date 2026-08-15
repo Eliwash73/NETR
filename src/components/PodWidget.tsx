@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     height: 80,
     marginVertical: 10,
     borderRadius: 20,
-    padding: 15,
+    padding: 20,
   },
   active: {
     transform: [{ scale: 0.98 }],
@@ -90,6 +90,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: "600",
+  },
+    trailing: {
+    alignItems: "flex-end",
   },
 });

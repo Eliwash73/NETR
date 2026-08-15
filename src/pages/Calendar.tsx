@@ -1,4 +1,4 @@
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused } from "expo-router/react-navigation";
 import * as Calendar from "expo-calendar";
 import { useTheme } from "expo-router/react-navigation";
 import React, { useEffect, useMemo, useState } from "react";
