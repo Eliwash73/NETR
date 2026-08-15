@@ -7,8 +7,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initializeDatabase } from "@/util/db";
 
 export default function RootLayout() {
+  const theme =  NETRLightTheme;
   const colorScheme = useColorScheme();
-  const theme = colorScheme === "dark" ? NETRDarkTheme : NETRLightTheme;
+  // const theme = colorScheme === "dark" ? NETRDarkTheme : NETRLightTheme;
 
   return (
     <SafeAreaProvider>

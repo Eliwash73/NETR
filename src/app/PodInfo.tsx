@@ -48,7 +48,7 @@ export default function PodInfo() {
   const [podItemName, setPodItemName] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [podItemQuantity, setPodItemQuantity] = useState("");
-  const [podItemQuantityUnit, setPodItemQuantityUnit] = useState("Other");
+  const [podItemQuantityUnit, setPodItemQuantityUnit] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Other");
   const [show, setShow] = useState(false);
 
@@ -132,7 +132,7 @@ export default function PodInfo() {
       setModalVisible(false);
       setPodItemName("");
       setPodItemQuantity("");
-      setPodItemQuantityUnit("Other");
+      setPodItemQuantityUnit("");
       setSelectedCategory("Other");
       setSelectedDate(new Date());
       setShow(false);
@@ -170,10 +170,15 @@ export default function PodInfo() {
     }
   };
 
-  const numColumns = 2;
+  const numColumns = 1;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: getColorByValue(colorString) },
+      ]}
+    >
       <FlatList
         data={podItems}
         keyExtractor={(item) => String(item.id)}
@@ -182,7 +187,7 @@ export default function PodInfo() {
           paddingHorizontal: horizontalPadding,
           paddingBottom: 150,
         }}
-        columnWrapperStyle={styles.columnWrapper}
+        // columnWrapperStyle={styles.columnWrapper}
         renderItem={({ item }) => (
           <View style={{ flex: 1, margin: 5 }}>
             <PodItemWidget
@@ -268,7 +273,7 @@ export default function PodInfo() {
             )}
             {Platform.OS === "ios" && (
               <View style={{ minHeight: 45, justifyContent: "center" }}>
-                <Host matchContents>
+                <Host>
                   <DatePicker
                     title="Best By Date"
                     selection={selectedDate}
@@ -279,7 +284,10 @@ export default function PodInfo() {
               </View>
             )}
             {Platform.OS !== "ios" && show && (
-              <DateTimePicker value={selectedDate} onChange={onChangeDate} />
+              <DateTimePicker
+                value={selectedDate}
+                onValueChange={onChangeDate}
+              />
             )}
           </View>
           <View>

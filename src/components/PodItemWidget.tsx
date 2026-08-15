@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, useTheme } from "expo-router";
 import React, { useState } from "react";
 import {  Pressable, StyleSheet, Text,  } from "react-native";
 import { colorChanger } from "./NETRTheme";
@@ -23,7 +23,7 @@ export default function PodItemWidget({
   podCategory,
 }: Props) {
   const router = useRouter();
-  const colorChanged = colorChanger(podColor);
+  const { colors } = useTheme();
 
   const openItem = () => {
     router.push({
@@ -47,8 +47,8 @@ export default function PodItemWidget({
     <Pressable
       style={[
         styles.itemContainer,
-        colorChanger(podColor),
         isPressed && styles.active,
+        { backgroundColor: colors.background },
       ]}
       onPressIn={() => setIsPressed(true)}
       onPressOut={() => setIsPressed(false)}
@@ -56,7 +56,9 @@ export default function PodItemWidget({
       onLongPress={() => {}} // Does nothing on long press
       onPress={openItem}
     >
-      <Text style={styles.title}>{podItemName}</Text>
+      <Text style={[styles.title, { color: colors.text }]}>
+        {podItemName}
+      </Text>
     </Pressable>
   );
 }

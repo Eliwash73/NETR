@@ -1,16 +1,16 @@
+// app/Items.tsx
+import PodItemListRow from "@/components/PodItemListRow";
 import { fetchAllPodsItems } from "@/util/db";
 import type { PodItem } from "@/util/db";
-import PodItemWidget from "@/components/PodItemWidget";
-import useScreenDimensions from "@/hooks/useScreenDimensions";
-import { useFocusEffect, useTheme } from "expo-router";
+import { useFocusEffect, useRouter, useTheme } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function Items() {
   const db = useSQLiteContext();
+  const router = useRouter();
   const { colors } = useTheme();
-  const { horizontalPadding } = useScreenDimensions();
   const [items, setItems] = useState<PodItem[]>([]);
 
   useFocusEffect(
@@ -39,7 +39,20 @@ export default function Items() {
     }, [db]),
   );
 
-  const numColumns = 2;
+  const openItem = (item: PodItem) => {
+    router.push({
+      pathname: "/PodItemInfo",
+      params: {
+        pod_id: String(item.pod_id),
+        pod_item_color: item.pod_color,
+        pod_item_title: item.pod_item_name,
+        pod_item_quantity: String(item.pod_item_quantity),
+        pod_item_quantity_unit: item.pod_item_quantity_unit,
+        pod_item_date: item.pod_item_date,
+        pod_item_category: item.pod_category,
+      },
+    });
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -48,31 +61,29 @@ export default function Items() {
           <Text style={{ color: colors.text }}>No items yet.</Text>
         </View>
       ) : (
-        <FlatList
-          data={items}
-          keyExtractor={(item) => String(item.id)}
-          numColumns={numColumns}
-          contentContainerStyle={{
-            paddingHorizontal: horizontalPadding,
-            paddingTop: 10,
-            paddingBottom: 150,
-          }}
-          columnWrapperStyle={styles.columnWrapper}
-          renderItem={({ item }) => (
-            <View style={{ flex: 1, margin: 5 }}>
-              <PodItemWidget
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <FlatList
+            data={items}
+            keyExtractor={(item) => String(item.id)}
+            ItemSeparatorComponent={() => (
+              <View
+                style={[styles.separator, { backgroundColor: colors.border }]}
+              />
+            )}
+            renderItem={({ item }) => (
+              <PodItemListRow
                 podColor={item.pod_color}
-                podID={String(item.pod_id)}
                 podItemName={item.pod_item_name}
                 podItemQuantity={item.pod_item_quantity}
                 podItemQuantityUnit={item.pod_item_quantity_unit}
                 podItemDate={item.pod_item_date}
                 podCategory={item.pod_category}
+                onPress={() => openItem(item)}
               />
-            </View>
-          )}
-          bounces={true}
-        />
+            )}
+            bounces={true}
+          />
+        </View>
       )}
     </View>
   );
@@ -81,9 +92,19 @@ export default function Items() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // paddingTop: 100,
   },
-  columnWrapper: {
-    justifyContent: "space-between",
+  card: {
+    // flex: 1,
+    marginHorizontal: 16,
+    marginTop: 75,
+    // marginBottom: 25,
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 40,
   },
   emptyState: {
     flex: 1,

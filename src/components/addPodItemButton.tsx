@@ -16,7 +16,7 @@ const AddPodItemButton = ({ onPress, buttonText, podColor }: AddPodItemButtonPro
       <Pressable onPress={onPress} style={[styles.button, { backgroundColor: colors.notification }]}>
         <Text style={[styles.buttonText, { color: colors.background }]}>{buttonText}</Text>
       </Pressable>
-    </View>
+    </View> 
   );
 };
 

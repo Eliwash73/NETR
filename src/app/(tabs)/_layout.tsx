@@ -6,14 +6,22 @@ export default function TabLayout() {
 
   return (
     <NativeTabs
-      backgroundColor={colors.card}
+      backgroundColor={colors.background}
       tintColor={colors.primary}
       iconColor={{
         default: colors.text, // inactive tabs
         selected: colors.primary, // active tab
       }}
-      rippleColor={colors.background}
-      indicatorColor={colors.background}
+      labelStyle={{
+        default: {
+          color: colors.text,
+        },
+        selected: {
+          color: colors.primary,
+        },
+      }}
+      rippleColor={colors.card}
+      indicatorColor={colors.card}
       disableIndicator={true}
     >
       <NativeTabs.Trigger name="index">
