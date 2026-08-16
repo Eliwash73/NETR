@@ -21,7 +21,7 @@ export default function RootLayout() {
           value={theme}
         >
           <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" options={{ title: "Back" }} />
+            <Stack.Screen name="(tabs)" options={{ title: "Pods" }} />
             <Stack.Screen name="PodInfo" options={{ title: "Pod Info", headerShown: true }} />
             <Stack.Screen name="PodItemInfo" options={{ title: "Pod Item Info", headerShown: true }} />
           </Stack>

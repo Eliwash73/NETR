@@ -8,7 +8,7 @@ import useScreenDimensions from "@/hooks/useScreenDimensions";
 import { addPodItem, deletePodItem, fetchPodsItems } from "@/util/db";
 import DateTimePicker from "@expo/ui/community/datetime-picker";
 import { DatePicker, Host } from "@expo/ui/swift-ui";
-import { useFocusEffect, useLocalSearchParams, useTheme } from "expo-router";
+import { Stack, useFocusEffect, useLocalSearchParams, useTheme } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useState } from "react";
 import {
@@ -39,6 +39,8 @@ export default function PodInfo() {
   const db = useSQLiteContext();
   const { colors } = useTheme();
   const { title, color, podID } = useLocalSearchParams();
+    const podTitle = Array.isArray(title) ? title[0] : title;
+
   const { horizontalPadding } = useScreenDimensions();
   const colorString = Array.isArray(color) ? color.join("/") : color;
   const colorScheme = useColorScheme();
@@ -173,129 +175,133 @@ export default function PodInfo() {
   const numColumns = 1;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: getColorByValue(colorString) },
-      ]}
-    >
-      <FlatList
-        data={podItems}
-        keyExtractor={(item) => String(item.id)}
-        numColumns={numColumns}
-        contentContainerStyle={{
-          paddingHorizontal: horizontalPadding,
-          paddingBottom: 150,
-        }}
-        // columnWrapperStyle={styles.columnWrapper}
-        renderItem={({ item }) => (
-          <View style={{ flex: 1, margin: 5 }}>
-            <PodItemWidget
-              podColor={colorString}
-              podID={String(item.pod_id)}
-              podItemName={item.pod_item_name}
-              podItemQuantity={item.pod_item_quantity}
-              podItemQuantityUnit={item.pod_item_quantity_unit}
-              podItemDate={item.pod_item_date}
-              podCategory={item.pod_category}
-            />
-          </View>
-        )}
-      />
-      <AddPodItemButton
-        onPress={handleModal}
-        buttonText="+"
-        podColor={getColorByValue(colorString)}
-      />
+    <>
+      <Stack.Screen options={{ title: podTitle ?? "Pod Info" }} />
 
-      <Modal
-        isVisible={isModalVisible}
-        avoidKeyboard={true}
-        onBackButtonPress={() => setModalVisible(false)}
-        onBackdropPress={() => setModalVisible(false)}
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: getColorByValue(colorString) },
+        ]}
       >
-        <View style={[styles.modal, { backgroundColor: colors.card }]}>
-          <TextInput
-            style={[
-              styles.nameInput,
-              { borderColor: colors.background, color: colors.text },
-            ]}
-            placeholder="Enter an Item Name"
-            placeholderTextColor={colors.text}
-            onChangeText={(text) => setPodItemName(text)}
-            maxLength={20}
-            value={podItemName}
-          />
-          <View style={styles.quantityUnitContainer}>
+        <FlatList
+          data={podItems}
+          keyExtractor={(item) => String(item.id)}
+          numColumns={numColumns}
+          contentContainerStyle={{
+            paddingHorizontal: horizontalPadding,
+            paddingBottom: 150,
+          }}
+          // columnWrapperStyle={styles.columnWrapper}
+          renderItem={({ item }) => (
+            <View style={{ flex: 1, margin: 5 }}>
+              <PodItemWidget
+                podColor={colorString}
+                podID={String(item.pod_id)}
+                podItemName={item.pod_item_name}
+                podItemQuantity={item.pod_item_quantity}
+                podItemQuantityUnit={item.pod_item_quantity_unit}
+                podItemDate={item.pod_item_date}
+                podCategory={item.pod_category}
+              />
+            </View>
+          )}
+        />
+        <AddPodItemButton
+          onPress={handleModal}
+          buttonText="+"
+          podColor={getColorByValue(colorString)}
+        />
+
+        <Modal
+          isVisible={isModalVisible}
+          avoidKeyboard={true}
+          onBackButtonPress={() => setModalVisible(false)}
+          onBackdropPress={() => setModalVisible(false)}
+        >
+          <View style={[styles.modal, { backgroundColor: colors.card }]}>
             <TextInput
               style={[
-                styles.quantityInput,
+                styles.nameInput,
                 { borderColor: colors.background, color: colors.text },
               ]}
-              placeholder="Enter a quantity"
+              placeholder="Enter an Item Name"
               placeholderTextColor={colors.text}
-              keyboardType="numeric"
-              onChangeText={handleQuantityChange}
-              value={podItemQuantity}
+              onChangeText={(text) => setPodItemName(text)}
+              maxLength={20}
+              value={podItemName}
             />
+            <View style={styles.quantityUnitContainer}>
+              <TextInput
+                style={[
+                  styles.quantityInput,
+                  { borderColor: colors.background, color: colors.text },
+                ]}
+                placeholder="Enter a quantity"
+                placeholderTextColor={colors.text}
+                keyboardType="numeric"
+                onChangeText={handleQuantityChange}
+                value={podItemQuantity}
+              />
+              <SelectList
+                setSelected={(val: string) => setPodItemQuantityUnit(val)}
+                data={PodItemUnits}
+                save="value"
+                placeholder="Select a Unit"
+                inputStyles={{ color: colors.text }}
+                boxStyles={{ borderColor: colors.background }}
+                search={true}
+              />
+            </View>
+
             <SelectList
-              setSelected={(val: string) => setPodItemQuantityUnit(val)}
-              data={PodItemUnits}
+              setSelected={(val: string) => setSelectedCategory(val)}
+              data={PodItemCategories}
               save="value"
-              placeholder="Select a Unit"
+              placeholder="Select a Category"
               inputStyles={{ color: colors.text }}
               boxStyles={{ borderColor: colors.background }}
               search={true}
             />
-          </View>
-
-          <SelectList
-            setSelected={(val: string) => setSelectedCategory(val)}
-            data={PodItemCategories}
-            save="value"
-            placeholder="Select a Category"
-            inputStyles={{ color: colors.text }}
-            boxStyles={{ borderColor: colors.background }}
-            search={true}
-          />
-          <View style={{ paddingTop: 10, paddingBottom: 10, gap: 10 }}>
-            {Platform.OS !== "ios" && (
-              <>
-                <CustomButton
-                  onPress={showOptions}
-                  title="Enter Best By date"
-                  color={TEAL}
-                />
-                <Text style={{ color: colors.text }}>
-                  Selected: {selectedDate.toDateString()}
-                </Text>
-              </>
-            )}
-            {Platform.OS === "ios" && (
-              <View style={{ minHeight: 45, justifyContent: "center" }}>
-                <Host>
-                  <DatePicker
-                    title="Best By Date"
-                    selection={selectedDate}
-                    displayedComponents={["date"]}
-                    onDateChange={(date: Date) => setSelectedDate(date)}
+            <View style={{ paddingTop: 10, paddingBottom: 10, gap: 10 }}>
+              {Platform.OS !== "ios" && (
+                <>
+                  <CustomButton
+                    onPress={showOptions}
+                    title="Enter Best By date"
+                    color={TEAL}
                   />
-                </Host>
-              </View>
-            )}
-            {Platform.OS !== "ios" && show && (
-              <DateTimePicker
-                value={selectedDate}
-                onValueChange={onChangeDate}
-              />
-            )}
+                  <Text style={{ color: colors.text }}>
+                    Selected: {selectedDate.toDateString()}
+                  </Text>
+                </>
+              )}
+              {Platform.OS === "ios" && (
+                <View style={{ minHeight: 45, justifyContent: "center" }}>
+                  <Host>
+                    <DatePicker
+                      title="Best By Date"
+                      selection={selectedDate}
+                      displayedComponents={["date"]}
+                      onDateChange={(date: Date) => setSelectedDate(date)}
+                    />
+                  </Host>
+                </View>
+              )}
+              {Platform.OS !== "ios" && show && (
+                <DateTimePicker
+                  value={selectedDate}
+                  onValueChange={onChangeDate}
+                />
+              )}
+            </View>
+            <View>
+              <CustomButton title="ADD" onPress={addPodItemToDB} color={TEAL} />
+            </View>
           </View>
-          <View>
-            <CustomButton title="ADD" onPress={addPodItemToDB} color={TEAL} />
-          </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+    </>
   );
 }
 

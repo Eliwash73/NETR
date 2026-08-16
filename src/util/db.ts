@@ -98,6 +98,18 @@ export async function updatePodColor(
   ]);
 }
 
+export async function updatePod(
+  db: SQLiteDatabase,
+  id: number,
+  podName: string,
+  podColor: string,
+) {
+  return db.runAsync(
+    "UPDATE pods SET pod_name = ?, pod_color = ? WHERE id = ?",
+    [podName, podColor, id],
+  );
+}
+
 //
 // Pod Items
 //

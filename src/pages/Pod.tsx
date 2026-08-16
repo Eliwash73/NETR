@@ -10,56 +10,33 @@ import {
 } from "react-native";
 import { router, useFocusEffect, useLocalSearchParams, useTheme } from "expo-router";
 import { SetStateAction, useCallback, useEffect, useState } from "react";
-import Modal from "react-native-modal";
-import { SelectList } from "react-native-dropdown-select-list";
 import useScreenDimensions from "@/hooks/useScreenDimensions";
 import { useSQLiteContext } from "expo-sqlite"; 
 import {
   GREY,
-  HONEYDEW,
-  PEACH,
-  PURPLE,
-  RED,
-  TEAL,
-  YELLOW,
-  colorChanger,
-  colorSelect,
+  HONEYDEW
 } from "@/components/NETRTheme";
 import PodWidget from "@/components/PodWidget";
 import AddPodButton from "@/components/addPodButton";
-import CustomButton from "@/components/customButton";
-
-import { addPod, deletePod, fetchPods } from "@/util/db";
-
-type Pod = {
+import PodForm from "@/components/PodForm";
+import { fetchPods, updatePod, addPod, deletePod } from "@/util/db";
+export type Pod = {
   id: number;
   pod_name: string;
   pod_color: string;
 };
 
 export default function PodScreen() {
-  const db = useSQLiteContext(); 
+  const db = useSQLiteContext();
   const { colors } = useTheme();
-  const { title, color, podID } = useLocalSearchParams();
   const { horizontalPadding } = useScreenDimensions();
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [isMenuVisible, setMenuVisible] = useState(false);
   const [pods, setPods] = useState<Pod[]>([]);
-  const [selectedColor, setSelectedColor] = useState("Honeydew");
-  const colorString = Array.isArray(color) ? color.join("/") : color;
-
-  const colorScheme = useColorScheme();
-  const colorChanged = colorChanger(colorString);
-  const [delID, setDelID] = useState(0);
-  const [podName, setPodName] = useState("");
-
-  const handleModal = () => setModalVisible(!isModalVisible);
-  const handleMenuModal = () => setMenuVisible(!isMenuVisible);
+  const [isFormVisible, setFormVisible] = useState(false);
+  const [editingPod, setEditingPod] = useState<Pod | undefined>(undefined);
 
   const loadPods = useCallback(async () => {
     try {
-      const result = await fetchPods(db);
-      setPods(result);
+      setPods(await fetchPods(db));
     } catch (error) {
       console.error("Failed to load pods:", error);
     }
@@ -67,113 +44,86 @@ export default function PodScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      let isActive = true;
-
-      const load = async () => {
-        const result = await fetchPods(db);
-
-        if (isActive) {
-          setPods(result);
-        }
-      };
-
-      load();
-
-      return () => {
-        isActive = false;
-      };
-    }, [db]),
+      loadPods();
+    }, [loadPods]),
   );
 
-  const addPodToDB = async () => {
-    if (!podName.trim()) return;
+  const openCreateForm = () => {
+    setEditingPod(undefined);
+    setFormVisible(true);
+  };
 
+  const openEditForm = (podID: string) => {
+    const pod = pods.find((p) => String(p.id) === podID);
+    if (pod) {
+      setEditingPod(pod);
+      setFormVisible(true);
+    }
+  };
+
+  const handleFormSubmit = async (podName: string, podColor: string) => {
     try {
-      await addPod(db, podName.trim(), selectedColor);
-
+      if (editingPod) {
+        await updatePod(db, editingPod.id, podName, podColor);
+      } else {
+        await addPod(db, podName, podColor);
+      }
       await loadPods();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setFormVisible(false);
+      setEditingPod(undefined);
+    }
+  };
 
-      setModalVisible(false);
-      setPodName("");
+  const handleDeletePod = async (podID: string) => {
+    try {
+      await deletePod(db, +podID);
+      setPods((prev) => prev.filter((p) => String(p.id) !== podID));
     } catch (error) {
       console.error(error);
     }
   };
 
-const handleDeletePod = (podID: string) => {
-  // e.g. call your API/store, then update local state
-  try {
-    // + converts the string to number
-    deletePod(db,+podID)
-  } catch (error) {
-        console.error(error);
-
-  }
-  setPods((prev) => prev.filter((p) => String(p.id) !== podID));
-};  return (
-    <View style={[styles.container,{backgroundColor: colors.background}]}>
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
         data={pods}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ paddingHorizontal: horizontalPadding }}
         ListFooterComponent={
           <View style={{ paddingBottom: 150 }}>
-            <AddPodButton onPress={handleModal} buttonText={"Add a new Pod"} />
+            <AddPodButton onPress={openCreateForm} buttonText="Add a new Pod" />
           </View>
         }
         renderItem={({ item }) => (
           <PodWidget
-                podID={String(item.id)}
-                podTitle={item.pod_name}
-                podColor={item.pod_color} 
-                deletePod={handleDeletePod} 
-                editPod={function (podID: string): void {
-                    throw new Error("Function not implemented.");
-                } }          />
+            podID={String(item.id)}
+            podTitle={item.pod_name}
+            podColor={item.pod_color}
+            deletePod={handleDeletePod}
+            editPod={openEditForm}
+          />
         )}
       />
-      <Modal
-        isVisible={isModalVisible}
-        avoidKeyboard={true}
-        onBackButtonPress={() => setModalVisible(false)}
-        onBackdropPress={() => setModalVisible(false)}
-      >
-        <View style={styles.addPodModal}>
-          <ScrollView>
-            <TextInput
-              style={styles.input}
-              placeholder={"Enter a Pod Name"}
-              onChangeText={(text) => setPodName(text)}
-              maxLength={20}
-              value={podName}
-            />
-            <View style={styles.addPodModalColor}>
-              <SelectList
-                setSelected={(val: SetStateAction<string>) =>
-                  setSelectedColor(val)
-                }
-                data={colorSelect}
-                save="value"
-                search={false}
-                placeholder={"Select a Color"}
-                boxStyles={colorChanged}
-              />
-            </View>
-          </ScrollView>
-          <View style={{ paddingTop: 30 }}>
-            <CustomButton title="Create" onPress={addPodToDB} color={TEAL} />
-          </View>
-        </View>
-      </Modal>
+      <PodForm
+        visible={isFormVisible}
+        existingPod={editingPod}
+        onClose={() => {
+          setFormVisible(false);
+          setEditingPod(undefined);
+        }}
+        onSubmit={handleFormSubmit}
+      />
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: 75,
+    marginTop: 75,
   },
   editButton: {
     padding: 5,

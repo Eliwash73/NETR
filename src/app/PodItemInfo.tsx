@@ -1,5 +1,5 @@
 import { getColorByValue } from "@/components/NETRTheme";
-import { useLocalSearchParams, useRouter, useTheme } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter, useTheme } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 type PodItemInfoParams = {
@@ -35,35 +35,37 @@ export default function PodItemInfo() {
   const backgroundColor = getColorByValue(podItemColor || "Grey");
 
   return (
-    <ScrollView
-      style={[styles.wrapper, { backgroundColor: colors.background }]}
-    >
+    <>
+      <Stack.Screen options={{ title: podItemTitle ?? "Pod Info" }} />
 
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
-        <Text style={styles.label}>Name</Text>
-        <Text style={[styles.value, { color: colors.text }]}>
-          {podItemTitle || "—"}
-        </Text>
+      <ScrollView
+        style={[styles.wrapper, { backgroundColor: colors.background }]}
+      >
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Text style={styles.label}>Name</Text>
+          <Text style={[styles.value, { color: colors.text }]}>
+            {podItemTitle || "—"}
+          </Text>
 
-        <Text style={styles.label}>Category</Text>
-        <Text style={[styles.value, { color: colors.text }]}>
-          {podItemCategory || "—"}
-        </Text>
+          <Text style={styles.label}>Category</Text>
+          <Text style={[styles.value, { color: colors.text }]}>
+            {podItemCategory || "—"}
+          </Text>
 
-        <Text style={styles.label}>Quantity</Text>
-        <Text style={[styles.value, { color: colors.text }]}>
-          {podItemQuantity ? `${podItemQuantity} ${podItemQuantityUnit}` : "—"}
-        </Text>
+          <Text style={styles.label}>Quantity</Text>
+          <Text style={[styles.value, { color: colors.text }]}>
+            {podItemQuantity
+              ? `${podItemQuantity} ${podItemQuantityUnit}`
+              : "—"}
+          </Text>
 
-        <Text style={styles.label}>Best by date</Text>
-        <Text style={[styles.value, { color: colors.text }]}>
-          {podItemDate || "—"}
-        </Text>
-
-
-      </View>
-
-    </ScrollView>
+          <Text style={styles.label}>Best by date</Text>
+          <Text style={[styles.value, { color: colors.text }]}>
+            {podItemDate || "—"}
+          </Text>
+        </View>
+      </ScrollView>
+    </>
   );
 }
 
