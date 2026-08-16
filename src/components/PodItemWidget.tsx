@@ -1,29 +1,42 @@
 import { useRouter, useTheme } from "expo-router";
 import React, { useState } from "react";
-import {  Pressable, StyleSheet, Text,  } from "react-native";
-import { colorChanger } from "./NETRTheme";
+import {
+  ActionSheetIOS,
+  Alert,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+} from "react-native";
 
 type Props = {
+  podID: string; // parent pod's id — used for navigation
+  itemID: string; // this pod item's own id — used for edit/delete
   podColor: string;
-  podID: string;
   podItemName: string;
   podItemQuantity: number;
   podItemQuantityUnit: string;
   podItemDate: string;
   podCategory: string;
+  editPodItem: (itemID: string) => void;
+  deletePodItem: (itemID: string) => void;
 };
 
 export default function PodItemWidget({
-  podColor,
   podID,
+  itemID,
+  podColor,
   podItemName,
   podItemQuantity,
   podItemQuantityUnit,
   podItemDate,
   podCategory,
+  editPodItem,
+  deletePodItem,
 }: Props) {
   const router = useRouter();
   const { colors } = useTheme();
+  const [isPressed, setIsPressed] = useState(false);
 
   const openItem = () => {
     router.push({
@@ -39,9 +52,39 @@ export default function PodItemWidget({
       },
     });
   };
-  const [isPressed, setIsPressed] = useState(false);
 
+  const confirmDelete = () => {
+    Alert.alert(
+      "Delete Item",
+      `Are you sure you want to delete "${podItemName}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: () => deletePodItem(itemID) },
+      ],
+    );
+  };
 
+  const handleLongPress = () => {
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ["Cancel", "Edit", "Delete"],
+          destructiveButtonIndex: 2,
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) editPodItem(itemID);
+          if (buttonIndex === 2) confirmDelete();
+        },
+      );
+    } else {
+      Alert.alert(podItemName, undefined, [
+        { text: "Edit", onPress: () => editPodItem(itemID) },
+        { text: "Delete", style: "destructive", onPress: confirmDelete },
+        { text: "Cancel", style: "cancel" },
+      ]);
+    }
+  };
 
   return (
     <Pressable
@@ -52,8 +95,7 @@ export default function PodItemWidget({
       ]}
       onPressIn={() => setIsPressed(true)}
       onPressOut={() => setIsPressed(false)}
-      //    onLongPress={handleLongPress}
-      onLongPress={() => {}} // Does nothing on long press
+      onLongPress={handleLongPress}
       onPress={openItem}
     >
       <Text style={[styles.title, { color: colors.text }]}>

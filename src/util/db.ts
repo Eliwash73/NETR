@@ -110,6 +110,29 @@ export async function updatePod(
   );
 }
 
+export async function updatePodItem(
+  db: SQLiteDatabase,
+  id: number,
+  podColor: string,
+  podItemName: string,
+  podItemQuantity: number,
+  podItemQuantityUnit: string,
+  podItemDate: string,
+  podCategory: string,
+) {
+  return db.runAsync(
+    `UPDATE pod_item SET
+      pod_color = ?,
+      pod_item_name = ?,
+      pod_item_quantity = ?,
+      pod_item_quantity_unit = ?,
+      pod_item_date = ?,
+      pod_category = ?
+     WHERE id = ?`,
+    [podColor, podItemName, podItemQuantity, podItemQuantityUnit, podItemDate, podCategory, id],
+  );
+}
+
 //
 // Pod Items
 //
