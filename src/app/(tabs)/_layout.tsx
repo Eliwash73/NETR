@@ -6,7 +6,7 @@ export default function TabLayout() {
 
   return (
     <NativeTabs
-      backgroundColor={colors.background}
+      backgroundColor={colors.card}
       tintColor={colors.primary}
       iconColor={{
         default: colors.text, // inactive tabs

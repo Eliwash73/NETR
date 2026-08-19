@@ -1,15 +1,10 @@
 import {
   View,
-  Text,
   StyleSheet,
   FlatList,
-  useColorScheme,
-  ScrollView,
-  Pressable,
-  TextInput,
 } from "react-native";
-import { router, useFocusEffect, useLocalSearchParams, useTheme } from "expo-router";
-import { SetStateAction, useCallback, useEffect, useState } from "react";
+import { useFocusEffect, useTheme } from "expo-router";
+import {  useCallback, useState } from "react";
 import useScreenDimensions from "@/hooks/useScreenDimensions";
 import { useSQLiteContext } from "expo-sqlite"; 
 import {

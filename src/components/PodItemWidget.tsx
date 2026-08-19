@@ -38,20 +38,21 @@ export default function PodItemWidget({
   const { colors } = useTheme();
   const [isPressed, setIsPressed] = useState(false);
 
-  const openItem = () => {
-    router.push({
-      pathname: "/PodItemInfo",
-      params: {
-        pod_id: podID,
-        pod_item_color: podColor,
-        pod_item_title: podItemName,
-        pod_item_quantity: String(podItemQuantity),
-        pod_item_quantity_unit: podItemQuantityUnit,
-        pod_item_date: podItemDate,
-        pod_item_category: podCategory,
-      },
-    });
-  };
+const openItem = () => {
+  router.push({
+    pathname: "/PodItemInfo",
+    params: {
+      pod_id: podID,
+      pod_item_id: itemID, // <-- this was missing
+      pod_item_color: podColor,
+      pod_item_title: podItemName,
+      pod_item_quantity: String(podItemQuantity),
+      pod_item_quantity_unit: podItemQuantityUnit,
+      pod_item_date: podItemDate,
+      pod_item_category: podCategory,
+    },
+  });
+};
 
   const confirmDelete = () => {
     Alert.alert(

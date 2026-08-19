@@ -92,13 +92,11 @@ export default function Items() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: 100,
   },
   card: {
-    // flex: 1,
     marginHorizontal: 16,
-    marginTop: 75,
-    // marginBottom: 25,
+    marginTop: 70,
+    marginBottom: 10,
     borderRadius: 20,
     overflow: "hidden",
   },

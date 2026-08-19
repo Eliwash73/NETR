@@ -106,12 +106,24 @@ export default function PodInfo() {
 
   return (
     <>
-      <Stack.Screen options={{ title: podTitle ?? "Pod Info" }} />
-      <View style={[styles.container, { backgroundColor: getColorByValue(colorString) }]}>
+      <Stack.Screen
+        options={{
+          title: podTitle ?? "Pod Info"
+        }}
+      />
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: getColorByValue(colorString) },
+        ]}
+      >
         <FlatList
           data={podItems}
           keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ paddingHorizontal: horizontalPadding, paddingBottom: 150 }}
+          contentContainerStyle={{
+            paddingHorizontal: horizontalPadding,
+            paddingBottom: 150,
+          }}
           renderItem={({ item }) => (
             <View style={{ flex: 1, margin: 5 }}>
               <PodItemWidget

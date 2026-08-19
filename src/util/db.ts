@@ -146,6 +146,15 @@ export async function fetchPodsItems(
     [podId],
   );
 }
+export async function fetchSinglePodItem(
+  db: SQLiteDatabase,
+  podId: number,
+): Promise<PodItem[]> {
+  return db.getAllAsync<PodItem>(
+    "SELECT * FROM pod_item WHERE id = ?",
+    [podId],
+  );
+}
 
 export async function fetchAllPodsItems(
   db: SQLiteDatabase,
